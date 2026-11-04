@@ -53,8 +53,18 @@ class CotizacionesController(
     @GetMapping("/resumen")
     fun resumen() = servicio.resumen()
 
+    /** Valores por defecto (de la configuración de la empresa) para prellenar una cotización nueva. */
     @GetMapping("/plantilla")
-    fun plantilla() = servicio.plantilla()
+    fun plantilla() =
+        servicio.plantilla().let {
+            mapOf(
+                "fechaEmision" to it.fechaEmision,
+                "fechaValidez" to it.fechaValidez,
+                "formaPago" to it.formaPago,
+                "plazoEntrega" to it.plazoEntrega,
+                "garantia" to it.garantia,
+            )
+        }
 
     /** Cálculo de totales para el editor: el servidor es la única fuente de verdad del IVA y los redondeos. */
     @PostMapping("/calcular")
