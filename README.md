@@ -4,6 +4,16 @@
 <p align="center"><b>Cotiza, envía y cierra.</b> Cotizaciones profesionales para pymes chilenas, con pago único y tus datos en tu computador.</p>
 
 <p align="center">
+  <a href="https://github.com/shastin-nav/tratohecho/actions/workflows/ci.yml"><img src="https://github.com/shastin-nav/tratohecho/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/shastin-nav/tratohecho/actions/workflows/codeql.yml"><img src="https://github.com/shastin-nav/tratohecho/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <a href="https://github.com/shastin-nav/tratohecho/releases"><img src="https://img.shields.io/github/v/release/shastin-nav/tratohecho?include_prereleases&label=versi%C3%B3n" alt="Versión"></a>
+</p>
+
+<p align="center">
+  <b>Demo en línea:</b> <i>próximamente</i> · <a href="https://github.com/shastin-nav/tratohecho/releases">Descargar para Windows, macOS o Linux</a>
+</p>
+
+<p align="center">
   <img src="docs/capturas/panel.png" width="49%" alt="Panel">
   <img src="docs/capturas/editor.png" width="49%" alt="Editor de cotizaciones">
 </p>

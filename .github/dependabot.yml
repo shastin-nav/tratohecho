@@ -1,3 +1,5 @@
+# Actualizaciones menores y parches llegan agrupadas cada semana.
+# Las versiones mayores (Vite, TypeScript, ESLint, Spring Boot, Kotlin…) se migran a mano y a propósito.
 version: 2
 updates:
   - package-ecosystem: gradle
@@ -5,20 +7,32 @@ updates:
     schedule:
       interval: weekly
     groups:
-      gradle:
-        patterns: ["*"]
+      gradle-menores:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
     groups:
-      npm:
-        patterns: ["*"]
+      npm-menores:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: npm
     directory: /e2e
     schedule:
       interval: monthly
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      acciones:
+        patterns: ["*"]
