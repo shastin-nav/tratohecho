@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: tratohecho
+  profiles:
+    default: local
+  main:
+    banner-mode: off
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  flyway:
+    locations: classpath:db/migration/common
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  error:
+    include-message: always
+  compression:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  api-docs:
+    path: /api/docs/openapi.json
+  swagger-ui:
+    path: /api/docs
+
+tratohecho:
+  licencia:
+    clave-publica: ${TRATOHECHO_CLAVE_PUBLICA:MCowBQYDK2VwAyEAmP/gBa6bhxBUIauLIF8+/vkqnwA0xS4CCMvzTDJQcOU=}

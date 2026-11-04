@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <title th:text="'Cotización ' + ${c.numero}">Cotización</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm 20mm 16mm;
+      @bottom-center {
+        content: "Página " counter(page) " de " counter(pages);
+        font-family: Helvetica, sans-serif; font-size: 8pt; color: #6b7280;
+      }
+    }
+    body { font-family: Helvetica, sans-serif; font-size: 9.5pt; color: #1f2937; }
+    .marca { position: fixed; top: 95mm; left: 0; width: 100%; text-align: center; font-size: 40pt; font-weight: bold; white-space: nowrap;
+             color: #e5e7eb; transform: rotate(-30deg); z-index: -1; }
+    table { width: 100%; border-collapse: collapse; }
+    .cabecera td { vertical-align: top; }
+    .logo { max-height: 22mm; max-width: 60mm; }
+    .empresa { font-size: 8.5pt; color: #4b5563; line-height: 1.4; }
+    .empresa strong { font-size: 11pt; color: #111827; }
+    .folio { border: 1.5pt solid #0f766e; color: #0f766e; text-align: center; padding: 6pt 10pt; width: 55mm; }
+    .folio .tipo { font-size: 12pt; font-weight: bold; letter-spacing: 0.5pt; }
+    .folio .numero { font-size: 13pt; font-weight: bold; margin-top: 3pt; }
+    .folio .rut { font-size: 9pt; margin-top: 3pt; }
+    h2 { font-size: 9pt; text-transform: uppercase; letter-spacing: 0.6pt; color: #0f766e; margin: 14pt 0 4pt 0; }
+    .datos td { padding: 1.5pt 0; }
+    .datos .etiqueta { color: #6b7280; width: 28mm; }
+    .items { margin-top: 10pt; }
+    .items th { background: #0f766e; color: #ffffff; font-size: 8.5pt; padding: 5pt 4pt; text-align: left; }
+    .items td { border-bottom: 0.5pt solid #e5e7eb; padding: 5pt 4pt; vertical-align: top; }
+    .num { text-align: right; white-space: nowrap; }
+    .codigo { color: #6b7280; font-size: 8pt; }
+    .exenta { color: #6b7280; font-size: 7.5pt; }
+    .totales { width: 75mm; margin-left: auto; margin-top: 8pt; }
+    .totales td { padding: 3pt 4pt; }
+    .totales .total td { border-top: 1.2pt solid #0f766e; font-weight: bold; font-size: 11.5pt; color: #0f766e; padding-top: 5pt; }
+    .condiciones td { padding: 2pt 0; vertical-align: top; }
+    .condiciones .etiqueta { color: #6b7280; width: 35mm; }
+    .nota { margin-top: 14pt; font-size: 8pt; color: #6b7280; }
+    .texto { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="marca" th:if="${marcaDeAgua != null}" th:text="${marcaDeAgua}">MARCA</div>
+
+  <table class="cabecera">
+    <tr>
+      <td>
+        <img class="logo" th:if="${logo != null}" th:src="${logo}" alt="Logo" />
+        <div class="empresa">
+          <strong th:text="${empresa.razonSocial}">Empresa</strong><br />
+          <span th:if="${empresa.giro != null}" th:text="${empresa.giro}">Giro</span><br th:if="${empresa.giro != null}" />
+          <span th:if="${empresaDireccion != null}" th:text="${empresaDireccion}">Dirección</span><br th:if="${empresaDireccion != null}" />
+          <span th:if="${empresa.telefono != null}" th:text="${empresa.telefono}">Teléfono</span>
+          <span th:if="${empresa.telefono != null and empresa.email != null}"> · </span>
+          <span th:if="${empresa.email != null}" th:text="${empresa.email}">Correo</span><br />
+          <span th:if="${empresa.sitioWeb != null}" th:text="${empresa.sitioWeb}">Sitio</span>
+        </div>
+      </td>
+      <td style="width: 60mm; text-align: right;">
+        <div class="folio">
+          <div class="rut" th:if="${empresaRut != null}" th:text="'R.U.T.: ' + ${empresaRut}">RUT</div>
+          <div class="tipo">COTIZACIÓN</div>
+          <div class="numero" th:text="${c.numero}">N° 1</div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <h2>Cliente</h2>
+  <table class="datos">
+    <tr><td class="etiqueta">Señor(es)</td><td th:text="${c.cliente.razonSocial}">Cliente</td>
+        <td class="etiqueta">Fecha</td><td th:text="${fechaEmision}">fecha</td></tr>
+    <tr><td class="etiqueta">R.U.T.</td><td th:text="${c.cliente.rut} ?: '—'">rut</td>
+        <td class="etiqueta">Válida hasta</td><td th:text="${fechaValidez}">validez</td></tr>
+    <tr><td class="etiqueta">Giro</td><td th:text="${c.cliente.giro} ?: '—'">giro</td>
+        <td class="etiqueta">Vendedor</td><td th:text="${c.vendedor} ?: '—'">vendedor</td></tr>
+    <tr><td class="etiqueta">Dirección</td><td th:text="${c.cliente.direccion} ?: '—'">dir</td>
+        <td class="etiqueta">Contacto</td>
+        <td th:text="${clienteContacto}">contacto</td></tr>
+  </table>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th class="num" style="width: 16mm;">Cant.</th>
+        <th style="width: 14mm;">Unidad</th>
+        <th class="num" style="width: 24mm;">Precio unit.</th>
+        <th class="num" style="width: 14mm;" th:if="${hayDescuentosLinea}">Dcto.</th>
+        <th class="num" style="width: 26mm;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="l : ${lineas}">
+        <td>
+          <span class="codigo" th:if="${l.codigo != null}" th:text="${l.codigo} + ' · '">COD</span>
+          <span class="texto" th:text="${l.descripcion}">Descripción</span>
+          <span class="exenta" th:if="${l.exenta}"> (exento)</span>
+        </td>
+        <td class="num" th:text="${l.cantidad}">1</td>
+        <td th:text="${l.unidad} ?: ''">un</td>
+        <td class="num" th:text="${l.precio}">$0</td>
+        <td class="num" th:if="${hayDescuentosLinea}" th:text="${l.descuento} ?: ''">0 %</td>
+        <td class="num" th:text="${l.subtotal}">$0</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="totales">
+    <tr th:if="${descuentoGlobalTexto != null}"><td>Subtotal</td><td class="num" th:text="${subtotal}">$0</td></tr>
+    <tr th:if="${descuentoGlobalTexto != null}"><td th:text="${descuentoGlobalTexto}">Descuento</td>
+        <td class="num" th:text="'-' + ${descuentoGlobal}">$0</td></tr>
+    <tr><td>Neto</td><td class="num" th:text="${neto}">$0</td></tr>
+    <tr th:if="${hayExento}"><td>Exento</td><td class="num" th:text="${exento}">$0</td></tr>
+    <tr><td th:text="'IVA ' + ${tasaIva}">IVA</td><td class="num" th:text="${iva}">$0</td></tr>
+    <tr class="total"><td>Total</td><td class="num" th:text="${total}">$0</td></tr>
+  </table>
+
+  <h2>Condiciones comerciales</h2>
+  <table class="condiciones">
+    <tr><td class="etiqueta">Validez de la oferta</td><td th:text="'Hasta el ' + ${fechaValidez}">validez</td></tr>
+    <tr th:if="${c.formaPago != null}"><td class="etiqueta">Forma de pago</td><td th:text="${c.formaPago}">pago</td></tr>
+    <tr th:if="${c.plazoEntrega != null}"><td class="etiqueta">Plazo de entrega</td><td th:text="${c.plazoEntrega}">plazo</td></tr>
+    <tr th:if="${c.garantia != null}"><td class="etiqueta">Garantía</td><td th:text="${c.garantia}">garantía</td></tr>
+  </table>
+
+  <div th:if="${c.observaciones != null}">
+    <h2>Observaciones</h2>
+    <div class="texto" th:text="${c.observaciones}">obs</div>
+  </div>
+
+  <div th:if="${empresa.condiciones != null}">
+    <h2>Condiciones generales</h2>
+    <div class="texto" th:text="${empresa.condiciones}">condiciones</div>
+  </div>
+
+  <p class="nota">
+    Valores en pesos chilenos. El total incluye <span th:text="'IVA ' + ${tasaIva}">IVA</span> sobre el monto neto.
+    Este documento es una cotización y no constituye un documento tributario.
+  </p>
+</body>
+</html>
