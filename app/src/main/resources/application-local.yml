@@ -1,0 +1,15 @@
+# Instalación de escritorio: SQLite en la carpeta de datos del sistema operativo, un solo usuario.
+tratohecho:
+  modo: local
+  acceso-local:
+    habilitado: true
+
+# El DataSource SQLite se crea en BaseDatosLocal (la ruta depende del sistema operativo).
+spring:
+  flyway:
+    placeholders:
+      id: INTEGER PRIMARY KEY AUTOINCREMENT
+      blob: BLOB
+
+server:
+  address: 127.0.0.1
