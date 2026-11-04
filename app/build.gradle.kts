@@ -57,15 +57,21 @@ val compilarFrontend by tasks.registering(Exec::class) {
 }
 
 // -PsinFrontend: compila y prueba solo el backend (más rápido en CI y en desarrollo).
-if (!project.hasProperty("sinFrontend")) {
-    tasks.named<ProcessResources>("processResources") {
-        dependsOn(compilarFrontend)
-        from(frontend.dir("dist")) { into("static") }
-    }
+// -PfrontendCompilado: usa frontend/dist ya compilado (p. ej. en otra etapa del Dockerfile) sin ejecutar npm.
+when {
+    project.hasProperty("sinFrontend") -> Unit
+    project.hasProperty("frontendCompilado") ->
+        tasks.named<ProcessResources>("processResources") { from(frontend.dir("dist")) { into("static") } }
+    else ->
+        tasks.named<ProcessResources>("processResources") {
+            dependsOn(compilarFrontend)
+            from(frontend.dir("dist")) { into("static") }
+        }
 }
 
 springBoot {
     buildInfo()
+    mainClass.set("cl.tratohecho.app.TratohechoApplicationKt")
 }
 
 tasks.register<JavaExec>("emitirLicencia") {

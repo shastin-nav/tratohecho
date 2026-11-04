@@ -42,7 +42,7 @@ class DatosDemo(
     @EventListener(ApplicationReadyEvent::class)
     fun alIniciar() = reiniciar()
 
-    @Scheduled(cron = "\${tratohecho.demo.reinicio-cron}")
+    @Scheduled(cron = "\${tratohecho.demo.reinicio-cron:0 0 * * * *}")
     fun reiniciar() {
         tx.ejecutar {
             listOf("evento_cotizacion", "linea_cotizacion", "cotizacion", "cliente", "item_catalogo", "licencia")
