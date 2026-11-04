@@ -22,7 +22,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       # check = ktlint + pruebas unitarias + integración en SQLite y PostgreSQL (Testcontainers) + ArchUnit
       - run: ./gradlew check -PsinFrontend --console=plain
       - uses: actions/upload-artifact@v4
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew :app:bootJar --console=plain
       - working-directory: e2e
         run: |
