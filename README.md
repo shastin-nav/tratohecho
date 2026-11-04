@@ -65,6 +65,8 @@ La API escucha solo en `127.0.0.1`. El lanzador genera un token aleatorio por se
 
 ## Desarrollo
 
+Proyecto desarrollado con asistencia de IA (Claude Code) mediante desarrollo guiado por especificaciones (SDD): yo defino las especificaciones, dirijo la implementación y verifico los resultados contra ellas.
+
 Requisitos: JDK 21, Node 22. Docker es opcional (solo para las pruebas contra PostgreSQL).
 
 ```bash

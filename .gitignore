@@ -13,3 +13,6 @@ frontend/dist/
 .env
 *.pem
 *.key
+
+# Caché de compilación incremental de TypeScript
+*.tsbuildinfo
