@@ -1,0 +1,18 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+ktlint_code_style = ktlint_official
+ktlint_standard_function-naming = disabled
+ktlint_standard_backing-property-naming = disabled
+max_line_length = 140
+
+[*.{ts,tsx,js,json,yml,yaml,css,html,md}]
+indent_size = 2
