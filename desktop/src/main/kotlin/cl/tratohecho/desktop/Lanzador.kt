@@ -95,7 +95,11 @@ private fun agregarIconoBandeja(
     val menu =
         PopupMenu().apply {
             add(MenuItem("Abrir Tratohecho").apply { addActionListener { abrirNavegador(url) } })
-            add(MenuItem("Abrir carpeta de datos").apply { addActionListener { runCatching { Desktop.getDesktop().open(carpeta.toFile()) } } })
+            add(
+                MenuItem(
+                    "Abrir carpeta de datos",
+                ).apply { addActionListener { runCatching { Desktop.getDesktop().open(carpeta.toFile()) } } },
+            )
             addSeparator()
             add(MenuItem("Salir").apply { addActionListener { salir() } })
         }
@@ -111,7 +115,13 @@ fun abrirNavegador(url: String) {
     val uri = URI(url)
     val abierto =
         runCatching {
-            check(!GraphicsEnvironment.isHeadless() && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
+            check(
+                !GraphicsEnvironment.isHeadless() &&
+                    Desktop.isDesktopSupported() &&
+                    Desktop.getDesktop().isSupported(
+                        Desktop.Action.BROWSE,
+                    ),
+            )
             Desktop.getDesktop().browse(uri)
         }.isSuccess
     if (abierto) return
@@ -128,7 +138,11 @@ fun abrirNavegador(url: String) {
 
 private fun avisar(mensaje: String) {
     System.err.println(mensaje)
-    if (!GraphicsEnvironment.isHeadless()) runCatching { JOptionPane.showMessageDialog(null, mensaje, "Tratohecho", JOptionPane.WARNING_MESSAGE) }
+    if (!GraphicsEnvironment.isHeadless()) {
+        runCatching {
+            JOptionPane.showMessageDialog(null, mensaje, "Tratohecho", JOptionPane.WARNING_MESSAGE)
+        }
+    }
 }
 
 /** Bloqueo de instancia única y archivo con la URL de la sesión (legible solo por el usuario actual). */

@@ -1,0 +1,111 @@
+name: Release
+
+# Al publicar una etiqueta v1.2.3 se generan los instaladores de Windows, macOS y Linux y se adjuntan a un GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  instaladores:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - so: windows-latest
+            tipo: msi
+          - so: macos-latest
+            tipo: dmg
+          - so: ubuntu-latest
+            tipo: deb
+    runs-on: ${{ matrix.so }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ github.ref_name }}
+      # Los secretos no se pueden leer en `if:` de un paso; se exponen como banderas a nivel de trabajo.
+      FIRMA_MAC: ${{ secrets.MAC_CERTIFICADO_P12 != '' }}
+      NOTARIZAR_MAC: ${{ secrets.APPLE_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: WiX Toolset 3 (requerido por jpackage para .msi)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install wixtoolset --version 3.14.1 -y --no-progress
+          "C:\Program Files (x86)\WiX Toolset v3.14\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Certificado de firma de macOS (opcional)
+        if: runner.os == 'macOS' && env.FIRMA_MAC == 'true'
+        env:
+          MAC_CERTIFICADO_P12: ${{ secrets.MAC_CERTIFICADO_P12 }}
+          MAC_CERTIFICADO_CLAVE: ${{ secrets.MAC_CERTIFICADO_CLAVE }}
+        run: |
+          echo "$MAC_CERTIFICADO_P12" | base64 --decode > certificado.p12
+          security create-keychain -p ci firma.keychain
+          security default-keychain -s firma.keychain
+          security unlock-keychain -p ci firma.keychain
+          security import certificado.p12 -k firma.keychain -P "$MAC_CERTIFICADO_CLAVE" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k ci firma.keychain
+          rm certificado.p12
+
+      - name: Instalador
+        env:
+          MAC_FIRMA_IDENTIDAD: ${{ secrets.MAC_FIRMA_IDENTIDAD }}
+        run: ./gradlew :desktop:empaquetar -Pversion="${VERSION#v}" --console=plain
+
+      - name: Prueba de humo del jar en este sistema operativo
+        env:
+          TRATOHECHO_SIN_NAVEGADOR: "1"
+        run: |
+          export TRATOHECHO_DATOS="$RUNNER_TEMP/datos"
+          java -Djava.awt.headless=true -jar desktop/build/libs/tratohecho.jar &
+          for i in $(seq 1 90); do
+            [ -f "$TRATOHECHO_DATOS/instancia.properties" ] && break; sleep 2
+          done
+          test -f "$TRATOHECHO_DATOS/instancia.properties"
+          echo "La aplicación inició correctamente"
+
+      - name: Notarización de macOS (opcional)
+        if: runner.os == 'macOS' && env.NOTARIZAR_MAC == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          DMG=$(ls desktop/build/instaladores/*.dmg)
+          xcrun notarytool submit "$DMG" --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
+          xcrun stapler staple "$DMG"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instalador-${{ matrix.tipo }}
+          path: desktop/build/instaladores/*
+
+  publicar:
+    needs: instaladores
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: instaladores
+          merge-multiple: true
+      - name: Sumas SHA-256
+        run: cd instaladores && sha256sum * > SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: instaladores/*
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
