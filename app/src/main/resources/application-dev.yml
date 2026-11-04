@@ -1,0 +1,7 @@
+# Desarrollo con `npm run dev` (Vite en :5173 hace de proxy a la API): sin token de acceso local.
+# ./gradlew :app:bootRun -PsinFrontend --args='--spring.profiles.active=local,dev'
+tratohecho:
+  acceso-local:
+    habilitado: false
+  datos:
+    directorio: ./build/datos-dev
