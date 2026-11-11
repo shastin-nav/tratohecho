@@ -16,7 +16,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0")
     implementation("org.thymeleaf:thymeleaf")
-    implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.108")
+    implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.110")
 
     runtimeOnly("org.xerial:sqlite-jdbc")
     runtimeOnly("org.postgresql:postgresql")
@@ -27,7 +27,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("com.tngtech.archunit:archunit:1.4.1")
+    testImplementation("com.tngtech.archunit:archunit:1.5.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
